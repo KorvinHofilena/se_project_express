@@ -25,6 +25,7 @@
   "homepage": "https://github.com/KorvinHofilena/se_project_express#readme",
   "dependencies": {
     "express": "^4.21.1",
+    "mongodb": "^6.11.0",
     "mongoose": "^6.6.1"
   },
   "devDependencies": {

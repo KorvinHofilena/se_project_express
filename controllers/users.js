@@ -1,26 +1,35 @@
 const User = require("../models/user");
+const { ERROR_CODES } = require("../utils/errors");
 
 module.exports.getUsers = (req, res) => {
   User.find()
     .then((users) => res.send(users))
-    .catch((err) =>
-      res.status(500).send({ message: "An error occurred on the server" })
-    );
+    .catch(() => {
+      res
+        .status(ERROR_CODES.SERVER_ERROR)
+        .send({ message: "An error occurred on the server" });
+    });
 };
 
 module.exports.getUser = (req, res) => {
   User.findById(req.params.userId)
     .orFail(() => {
       const error = new Error("User not found");
-      error.statusCode = 404;
+      error.statusCode = ERROR_CODES.NOT_FOUND;
       throw error;
     })
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.statusCode === 404) {
-        res.status(404).send({ message: err.message });
+      if (err.name === "CastError") {
+        res
+          .status(ERROR_CODES.BAD_REQUEST)
+          .send({ message: "Invalid user ID passed" });
+      } else if (err.statusCode === ERROR_CODES.NOT_FOUND) {
+        res.status(ERROR_CODES.NOT_FOUND).send({ message: err.message });
       } else {
-        res.status(500).send({ message: "An error occurred on the server" });
+        res
+          .status(ERROR_CODES.SERVER_ERROR)
+          .send({ message: "An error occurred on the server" });
       }
     });
 };
@@ -32,9 +41,13 @@ module.exports.createUser = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === "ValidationError") {
-        res.status(400).send({ message: "Invalid data passed to create user" });
+        res
+          .status(ERROR_CODES.BAD_REQUEST)
+          .send({ message: "Invalid data passed to create user" });
       } else {
-        res.status(500).send({ message: "An error occurred on the server" });
+        res
+          .status(ERROR_CODES.SERVER_ERROR)
+          .send({ message: "An error occurred on the server" });
       }
     });
 };

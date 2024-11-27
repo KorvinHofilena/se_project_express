@@ -1,5 +1,5 @@
 const express = require("express");
-const mongoose = require("mongoose");
+const { connectToDatabase } = require("./db");
 const routes = require("./routes");
 const { ERROR_CODES } = require("./utils/errors");
 
@@ -9,10 +9,7 @@ const app = express();
 
 (async () => {
   try {
-    await mongoose.connect("mongodb://127.0.0.1:27017/wtwrdb", {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await connectToDatabase();
     console.log("Connected to the database");
 
     app.use(express.json());

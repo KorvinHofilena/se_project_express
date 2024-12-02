@@ -1,7 +1,9 @@
 const express = require("express");
+const cors = require("cors");
 const { connectToDatabase } = require("./db");
 const routes = require("./routes");
 const { ERROR_CODES } = require("./utils/errors");
+const auth = require("./middlewares/auth");
 
 const { PORT = 3001 } = process.env;
 
@@ -14,10 +16,7 @@ const app = express();
 
     app.use(express.json());
 
-    app.use((req, res, next) => {
-      req.user = { _id: "60df3b78c2d7b814c8b5369a" };
-      next();
-    });
+    app.use(cors());
 
     app.use(routes);
 
@@ -27,7 +26,7 @@ const app = express();
         .send({ message: "Requested resource not found" });
     });
 
-    app.use((err, req, res) => {
+    app.use((err, req, res, next) => {
       const {
         statusCode = ERROR_CODES.SERVER_ERROR,
         message = "An error occurred on the server",

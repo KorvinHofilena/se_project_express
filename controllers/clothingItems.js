@@ -16,7 +16,7 @@ module.exports.createClothingItem = (req, res) => {
   const owner = req.user._id;
 
   ClothingItem.create({ name, weather, imageUrl, owner })
-    .then((item) => res.send(item))
+    .then((item) => res.status(201).send(item))
     .catch((err) => {
       if (err.name === "ValidationError") {
         res
@@ -31,11 +31,19 @@ module.exports.createClothingItem = (req, res) => {
 };
 
 module.exports.deleteClothingItem = (req, res) => {
-  ClothingItem.findByIdAndRemove(req.params.itemId)
+  ClothingItem.findById(req.params.itemId)
     .orFail(() => {
       const error = new Error("Item not found");
       error.statusCode = ERROR_CODES.NOT_FOUND;
       throw error;
+    })
+    .then((item) => {
+      if (!item.owner.equals(req.user._id)) {
+        return res
+          .status(ERROR_CODES.FORBIDDEN)
+          .send({ message: "You do not have permission to delete this item" });
+      }
+      return item.deleteOne();
     })
     .then(() => res.send({ message: "Item deleted successfully" }))
     .catch((err) => {
@@ -45,6 +53,8 @@ module.exports.deleteClothingItem = (req, res) => {
           .send({ message: "Invalid item ID passed" });
       } else if (err.statusCode === ERROR_CODES.NOT_FOUND) {
         res.status(ERROR_CODES.NOT_FOUND).send({ message: err.message });
+      } else if (err.statusCode === ERROR_CODES.FORBIDDEN) {
+        res.status(ERROR_CODES.FORBIDDEN).send({ message: err.message });
       } else {
         res
           .status(ERROR_CODES.SERVER_ERROR)

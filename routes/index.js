@@ -10,6 +10,7 @@ router.post("/signup", createUser);
 router.post("/signin", login);
 
 router.use("/users", auth, userRoutes);
-router.use("/items", auth, clothingRoutes);
+
+router.use("/items", clothingRoutes);
 
 module.exports = router;

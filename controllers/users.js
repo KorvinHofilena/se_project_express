@@ -4,39 +4,6 @@ const User = require("../models/user");
 const { ERROR_CODES } = require("../utils/errors");
 const { JWT_SECRET } = require("../utils/config");
 
-module.exports.getUsers = (req, res) => {
-  User.find()
-    .then((users) => res.send(users))
-    .catch(() => {
-      res
-        .status(ERROR_CODES.SERVER_ERROR)
-        .send({ message: "An error occurred on the server" });
-    });
-};
-
-module.exports.getUser = (req, res) => {
-  User.findById(req.params.userId)
-    .orFail(() => {
-      const error = new Error("User not found");
-      error.statusCode = ERROR_CODES.NOT_FOUND;
-      throw error;
-    })
-    .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.name === "CastError") {
-        res
-          .status(ERROR_CODES.BAD_REQUEST)
-          .send({ message: "Invalid user ID passed" });
-      } else if (err.statusCode === ERROR_CODES.NOT_FOUND) {
-        res.status(ERROR_CODES.NOT_FOUND).send({ message: err.message });
-      } else {
-        res
-          .status(ERROR_CODES.SERVER_ERROR)
-          .send({ message: "An error occurred on the server" });
-      }
-    });
-};
-
 module.exports.getCurrentUser = (req, res) => {
   User.findById(req.user._id)
     .then((user) => {
@@ -47,11 +14,11 @@ module.exports.getCurrentUser = (req, res) => {
       }
       res.send(user);
     })
-    .catch(() => {
+    .catch(() =>
       res
         .status(ERROR_CODES.SERVER_ERROR)
-        .send({ message: "An error occurred on the server" });
-    });
+        .send({ message: "An error occurred on the server" })
+    );
 };
 
 module.exports.createUser = (req, res) => {
@@ -67,9 +34,7 @@ module.exports.createUser = (req, res) => {
     )
     .catch((err) => {
       if (err.code === 11000) {
-        res
-          .status(ERROR_CODES.CONFLICT)
-          .send({ message: "Email already exists" });
+        res.status(409).send({ message: "Email already exists" });
       } else if (err.name === "ValidationError") {
         res
           .status(ERROR_CODES.BAD_REQUEST)
@@ -84,6 +49,12 @@ module.exports.createUser = (req, res) => {
 
 module.exports.login = (req, res) => {
   const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res
+      .status(ERROR_CODES.BAD_REQUEST)
+      .send({ message: "Email and password must be provided" });
+  }
 
   User.findOne({ email })
     .select("+password")
@@ -101,10 +72,14 @@ module.exports.login = (req, res) => {
         res.send({ token });
       });
     })
-    .catch(() => {
-      res
-        .status(ERROR_CODES.UNAUTHORIZED)
-        .send({ message: "Incorrect email or password" });
+    .catch((err) => {
+      if (err.message === "Incorrect email or password") {
+        res.status(401).send({ message: err.message });
+      } else {
+        res
+          .status(ERROR_CODES.SERVER_ERROR)
+          .send({ message: "An error occurred on the server" });
+      }
     });
 };
 

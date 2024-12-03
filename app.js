@@ -3,7 +3,6 @@ const cors = require("cors");
 const { connectToDatabase } = require("./db");
 const routes = require("./routes");
 const { ERROR_CODES } = require("./utils/errors");
-const auth = require("./middlewares/auth");
 
 const { PORT = 3001 } = process.env;
 

@@ -39,9 +39,11 @@ module.exports.deleteClothingItem = (req, res) => {
     })
     .then((item) => {
       if (!item.owner.equals(req.user._id)) {
-        return res
-          .status(ERROR_CODES.FORBIDDEN)
-          .send({ message: "You do not have permission to delete this item" });
+        const error = new Error(
+          "You do not have permission to delete this item"
+        );
+        error.statusCode = ERROR_CODES.FORBIDDEN;
+        throw error;
       }
       return item.deleteOne();
     })

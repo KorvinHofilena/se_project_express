@@ -1,13 +1,12 @@
 const express = require("express");
 const cors = require("cors");
+const winston = require("winston");
 const { connectToDatabase } = require("./db");
 const routes = require("./routes");
 const { ERROR_CODES } = require("./utils/errors");
-const winston = require("winston");
 
 const { PORT = 3001 } = process.env;
 
-// Configure Winston logger
 const logger = winston.createLogger({
   level: "info",
   format: winston.format.combine(

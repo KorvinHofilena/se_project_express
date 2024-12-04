@@ -3,20 +3,29 @@ const cors = require("cors");
 const { connectToDatabase } = require("./db");
 const routes = require("./routes");
 const { ERROR_CODES } = require("./utils/errors");
+const winston = require("winston");
 
 const { PORT = 3001 } = process.env;
+
+// Configure Winston logger
+const logger = winston.createLogger({
+  level: "info",
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+  ),
+  transports: [new winston.transports.Console()],
+});
 
 const app = express();
 
 (async () => {
   try {
     await connectToDatabase();
-    console.log("Connected to the database");
+    logger.info("Connected to the database");
 
     app.use(express.json());
-
     app.use(cors());
-
     app.use(routes);
 
     app.use((req, res) => {
@@ -30,14 +39,15 @@ const app = express();
         statusCode = ERROR_CODES.SERVER_ERROR,
         message = "An error occurred on the server",
       } = err;
+      logger.error(`Error: ${message}, Status Code: ${statusCode}`);
       res.status(statusCode).send({ message });
     });
 
     app.listen(PORT, () => {
-      console.log(`App is running on port ${PORT}`);
+      logger.info(`App is running on port ${PORT}`);
     });
   } catch (error) {
-    console.error("Failed to start server:", error);
+    logger.error("Failed to start server:", error);
     process.exit(1);
   }
 })();

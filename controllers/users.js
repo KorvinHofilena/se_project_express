@@ -34,7 +34,9 @@ module.exports.createUser = (req, res) => {
     )
     .catch((err) => {
       if (err.code === 11000) {
-        res.status(409).send({ message: "Email already exists" });
+        res
+          .status(ERROR_CODES.CONFLICT)
+          .send({ message: "Email already exists" });
       } else if (err.name === "ValidationError") {
         res
           .status(ERROR_CODES.BAD_REQUEST)
@@ -74,7 +76,7 @@ module.exports.login = (req, res) => {
     })
     .catch((err) => {
       if (err.message === "Incorrect email or password") {
-        res.status(401).send({ message: err.message });
+        res.status(ERROR_CODES.UNAUTHORIZED).send({ message: err.message });
       } else {
         res
           .status(ERROR_CODES.SERVER_ERROR)

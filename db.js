@@ -1,4 +1,4 @@
-const { MongoClient } = require("mongodb");
+const mongoose = require("mongoose");
 const winston = require("winston");
 
 const logger = winston.createLogger({
@@ -10,18 +10,20 @@ const logger = winston.createLogger({
   transports: [new winston.transports.Console()],
 });
 
-const uri = "mongodb://127.0.0.1:27017";
-const client = new MongoClient(uri);
+const uri = "mongodb://127.0.0.1:27017/wtwr_db";
 
 async function connectToDatabase() {
   try {
-    await client.connect();
-    logger.info("Connected to MongoDB locally!");
-    return client;
+    await mongoose.connect(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    logger.info("Connected to MongoDB locally using Mongoose!");
+    return mongoose.connection;
   } catch (error) {
-    logger.error("Error connecting to MongoDB:", error);
+    logger.error("Error connecting to MongoDB using Mongoose:", error);
     throw error;
   }
 }
 
-module.exports = { connectToDatabase, client };
+module.exports = { connectToDatabase };

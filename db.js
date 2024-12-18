@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const winston = require("winston");
 
+mongoose.set("strictQuery", true);
+
 const logger = winston.createLogger({
   level: "info",
   format: winston.format.combine(

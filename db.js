@@ -10,7 +10,7 @@ const logger = winston.createLogger({
   transports: [new winston.transports.Console()],
 });
 
-const uri = "mongodb://127.0.0.1:27017/wtwr_db";
+const uri = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/wtwr_db";
 
 async function connectToDatabase() {
   try {
@@ -18,12 +18,24 @@ async function connectToDatabase() {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    logger.info("Connected to MongoDB locally using Mongoose!");
+
+    logger.info(`Connected to MongoDB at ${uri}`);
     return mongoose.connection;
   } catch (error) {
-    logger.error("Error connecting to MongoDB using Mongoose:", error);
-    throw error;
+    logger.error("Error connecting to MongoDB using Mongoose:", error.message);
+
+    process.exit(1);
   }
 }
+
+mongoose.connection.on("disconnected", () => {
+  logger.warn("MongoDB connection closed");
+});
+
+process.on("SIGINT", async () => {
+  await mongoose.connection.close();
+  logger.info("MongoDB connection closed due to application termination");
+  process.exit(0);
+});
 
 module.exports = { connectToDatabase };

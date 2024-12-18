@@ -1,3 +1,4 @@
+require("dotenv").config();
 const mongoose = require("mongoose");
 const winston = require("winston");
 
@@ -12,8 +13,7 @@ const logger = winston.createLogger({
   transports: [new winston.transports.Console()],
 });
 
-const uri =
-  "mongodb+srv://hofilenakorvin:<hofilenakorvin>@cluster0.lo8fk.mongodb.net/myDatabaseName?retryWrites=true&w=majority";
+const uri = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/default_db";
 
 async function connectToDatabase() {
   try {
@@ -21,10 +21,10 @@ async function connectToDatabase() {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    logger.info("Connected to MongoDB Atlas!");
+    logger.info(`Connected to MongoDB at ${uri}`);
     return mongoose.connection;
   } catch (error) {
-    logger.error("Error connecting to MongoDB Atlas:", error.message);
+    logger.error("Error connecting to MongoDB:", error.message);
     process.exit(1);
   }
 }

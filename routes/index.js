@@ -6,6 +6,10 @@ const auth = require("../middlewares/auth");
 
 const router = express.Router();
 
+router.get("/", (req, res) => {
+  res.send({ message: "Welcome to my API!" });
+});
+
 router.post("/signup", createUser);
 router.post("/signin", login);
 

@@ -1,4 +1,4 @@
-const ClothingItem = require("../models/clothingItem");
+const ClothingItem = require("../models/clothingitems");
 const { ERROR_CODES } = require("../utils/errors");
 
 module.exports.getClothingItems = (req, res) => {
@@ -7,7 +7,7 @@ module.exports.getClothingItems = (req, res) => {
     .catch(() =>
       res
         .status(ERROR_CODES.SERVER_ERROR)
-        .send({ message: "An error occurred on the server" })
+        .send({ error: "An error occurred on the server" })
     );
 };
 
@@ -18,14 +18,12 @@ module.exports.createClothingItem = (req, res) => {
   ClothingItem.create({ name, weather, imageUrl, owner })
     .then((item) => res.status(201).send(item))
     .catch((err) => {
+      let message = "An error occurred on the server";
       if (err.name === "ValidationError") {
-        res
-          .status(ERROR_CODES.BAD_REQUEST)
-          .send({ message: "Invalid data passed to create item" });
+        message = "Invalid data passed to create item";
+        res.status(ERROR_CODES.BAD_REQUEST).send({ error: message });
       } else {
-        res
-          .status(ERROR_CODES.SERVER_ERROR)
-          .send({ message: "An error occurred on the server" });
+        res.status(ERROR_CODES.SERVER_ERROR).send({ error: message });
       }
     });
 };
@@ -52,15 +50,15 @@ module.exports.deleteClothingItem = (req, res) => {
       if (err.name === "CastError") {
         res
           .status(ERROR_CODES.BAD_REQUEST)
-          .send({ message: "Invalid item ID passed" });
+          .send({ error: "Invalid item ID passed" });
       } else if (err.statusCode === ERROR_CODES.NOT_FOUND) {
-        res.status(ERROR_CODES.NOT_FOUND).send({ message: err.message });
+        res.status(ERROR_CODES.NOT_FOUND).send({ error: err.message });
       } else if (err.statusCode === ERROR_CODES.FORBIDDEN) {
-        res.status(ERROR_CODES.FORBIDDEN).send({ message: err.message });
+        res.status(ERROR_CODES.FORBIDDEN).send({ error: err.message });
       } else {
         res
           .status(ERROR_CODES.SERVER_ERROR)
-          .send({ message: "An error occurred on the server" });
+          .send({ error: "An error occurred on the server" });
       }
     });
 };
@@ -81,13 +79,13 @@ module.exports.likeItem = (req, res) => {
       if (err.name === "CastError") {
         res
           .status(ERROR_CODES.BAD_REQUEST)
-          .send({ message: "Invalid item ID passed" });
+          .send({ error: "Invalid item ID passed" });
       } else if (err.statusCode === ERROR_CODES.NOT_FOUND) {
-        res.status(ERROR_CODES.NOT_FOUND).send({ message: err.message });
+        res.status(ERROR_CODES.NOT_FOUND).send({ error: err.message });
       } else {
         res
           .status(ERROR_CODES.SERVER_ERROR)
-          .send({ message: "An error occurred on the server" });
+          .send({ error: "An error occurred on the server" });
       }
     });
 };
@@ -108,13 +106,13 @@ module.exports.dislikeItem = (req, res) => {
       if (err.name === "CastError") {
         res
           .status(ERROR_CODES.BAD_REQUEST)
-          .send({ message: "Invalid item ID passed" });
+          .send({ error: "Invalid item ID passed" });
       } else if (err.statusCode === ERROR_CODES.NOT_FOUND) {
-        res.status(ERROR_CODES.NOT_FOUND).send({ message: err.message });
+        res.status(ERROR_CODES.NOT_FOUND).send({ error: err.message });
       } else {
         res
           .status(ERROR_CODES.SERVER_ERROR)
-          .send({ message: "An error occurred on the server" });
+          .send({ error: "An error occurred on the server" });
       }
     });
 };

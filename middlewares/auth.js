@@ -8,7 +8,7 @@ const auth = (req, res, next) => {
   if (!authorization || !authorization.startsWith("Bearer ")) {
     return res
       .status(ERROR_CODES.UNAUTHORIZED)
-      .send({ message: "Authorization required" });
+      .send({ message: "Authorization required: No token provided" });
   }
 
   const token = authorization.replace("Bearer ", "");
@@ -19,7 +19,7 @@ const auth = (req, res, next) => {
   } catch (err) {
     return res
       .status(ERROR_CODES.UNAUTHORIZED)
-      .send({ message: "Invalid token" });
+      .send({ message: "Invalid token: Could not verify" });
   }
 
   req.user = payload;

@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const Item = require("../src/models/Item");
+const Item = require("../models/clothingItem.js");
 
 mongoose.connect("mongodb://localhost:27017/itemsDB", {
   useNewUrlParser: true,

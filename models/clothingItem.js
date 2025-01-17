@@ -13,7 +13,7 @@ const clothingItemSchema = new mongoose.Schema({
     required: true,
     enum: ["hot", "warm", "cold"],
   },
-  imageUrl: {
+  link: {
     type: String,
     required: true,
     validate: {
@@ -24,7 +24,7 @@ const clothingItemSchema = new mongoose.Schema({
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-    required: true,
+    required: false,
   },
   likes: [
     {
@@ -38,3 +38,5 @@ const clothingItemSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
+
+module.exports = mongoose.model("ClothingItem", clothingItemSchema);

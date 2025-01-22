@@ -15,28 +15,32 @@ const logger = winston.createLogger({
 
 const uri = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/default_db";
 
-async function connectToDatabase() {
-  try {
-    await mongoose.connect(uri, {
+function connectToDatabase() {
+  mongoose
+    .connect(uri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+    })
+    .then(() => {
+      logger.info(`Connected to MongoDB at ${uri}`);
+    })
+    .catch((error) => {
+      logger.error("Error connecting to MongoDB:", error.message);
+      process.exit(1);
     });
-    logger.info(`Connected to MongoDB at ${uri}`);
-    return mongoose.connection;
-  } catch (error) {
-    logger.error("Error connecting to MongoDB:", error.message);
-    process.exit(1);
-  }
+
+  mongoose.connection.on("disconnected", () => {
+    logger.warn("MongoDB connection closed");
+  });
+
+  process.on("SIGINT", () => {
+    mongoose.connection.close().then(() => {
+      logger.info("MongoDB connection closed due to application termination");
+      process.exit(0);
+    });
+  });
+
+  return mongoose.connection;
 }
-
-mongoose.connection.on("disconnected", () => {
-  logger.warn("MongoDB connection closed");
-});
-
-process.on("SIGINT", async () => {
-  await mongoose.connection.close();
-  logger.info("MongoDB connection closed due to application termination");
-  process.exit(0);
-});
 
 module.exports = { connectToDatabase };

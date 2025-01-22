@@ -12,18 +12,13 @@ const auth = (req, res, next) => {
   }
 
   const token = authorization.replace("Bearer ", "");
-  let payload;
-
   try {
-    payload = jwt.verify(token, JWT_SECRET);
+    const payload = jwt.verify(token, JWT_SECRET);
+    req.user = payload;
+    next();
   } catch (err) {
-    return res
-      .status(ERROR_CODES.UNAUTHORIZED)
-      .send({ message: "Invalid token" });
+    res.status(ERROR_CODES.UNAUTHORIZED).send({ message: "Invalid token" });
   }
-
-  req.user = payload;
-  next();
 };
 
 module.exports = auth;

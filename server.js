@@ -18,6 +18,10 @@ const itemSchema = new mongoose.Schema({
   name: String,
   description: String,
   price: Number,
+  likes: {
+    type: Number,
+    default: 0,
+  },
 });
 
 const Item = mongoose.model("Item", itemSchema);
@@ -39,6 +43,34 @@ app.post("/items", async (req, res) => {
     res.status(201).json(newItem);
   } catch (error) {
     res.status(500).json({ message: "Error creating item", error });
+  }
+});
+
+app.put("/items/:id/likes", async (req, res) => {
+  try {
+    const item = await Item.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { likes: 1 } },
+      { new: true }
+    );
+    if (!item) return res.status(404).json({ message: "Item not found" });
+    res.status(200).json(item);
+  } catch (error) {
+    res.status(500).json({ message: "Error liking item", error });
+  }
+});
+
+app.delete("/items/:id/likes", async (req, res) => {
+  try {
+    const item = await Item.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { likes: -1 } },
+      { new: true }
+    );
+    if (!item) return res.status(404).json({ message: "Item not found" });
+    res.status(200).json(item);
+  } catch (error) {
+    res.status(500).json({ message: "Error removing like", error });
   }
 });
 

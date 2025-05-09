@@ -2,6 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const winston = require("winston");
+const { errors } = require("celebrate");
+
 const { connectToDatabase } = require("./db");
 const routes = require("./routes");
 const { ERROR_CODES } = require("./utils/errors");
@@ -21,9 +23,18 @@ const app = express();
 
 connectToDatabase();
 
+app.get("/crash-test", () => {
+  setTimeout(() => {
+    throw new Error("Server will crash now");
+  }, 0);
+});
+
 app.use(express.json());
 app.use(cors());
+
 app.use(routes);
+
+app.use(errors());
 
 app.use((req, res) => {
   res
@@ -31,6 +42,7 @@ app.use((req, res) => {
     .send({ message: "Requested resource not found" });
 });
 
+g;
 app.use((err, req, res, next) => {
   const {
     statusCode = ERROR_CODES.SERVER_ERROR,

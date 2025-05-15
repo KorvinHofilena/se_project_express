@@ -3,10 +3,15 @@ const express = require("express");
 const cors = require("cors");
 const winston = require("winston");
 const { errors } = require("celebrate");
+const morgan = require("morgan");
 
 const { connectToDatabase } = require("./db");
 const routes = require("./routes");
-const { ERROR_CODES } = require("./utils/errors");
+const {
+  NotFoundError,
+  ERROR_CODES,
+  InternalServerError,
+} = require("./utils/errors");
 
 const { PORT = 3001 } = process.env;
 
@@ -32,17 +37,22 @@ app.get("/crash-test", () => {
 app.use(express.json());
 app.use(cors());
 
+app.use(
+  morgan("combined", {
+    stream: {
+      write: (message) => logger.info(message.trim()),
+    },
+  })
+);
+
 app.use(routes);
 
 app.use(errors());
 
-app.use((req, res) => {
-  res
-    .status(ERROR_CODES.NOT_FOUND)
-    .send({ message: "Requested resource not found" });
+app.use((req, res, next) => {
+  next(new NotFoundError("Requested resource not found"));
 });
 
-g;
 app.use((err, req, res, next) => {
   const {
     statusCode = ERROR_CODES.SERVER_ERROR,

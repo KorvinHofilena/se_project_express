@@ -10,10 +10,15 @@ module.exports = {
   },
   rules: {
     "no-underscore-dangle": ["error", { allow: ["_id"] }],
-    "no-console": "warn",
-    "no-unused-vars": ["error", { args: "none", varsIgnorePattern: "^_" }],
+    "no-console": "off",
+    "no-unused-vars": [
+      "error",
+      { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+    ],
     "consistent-return": "off",
     "no-shadow": "off",
     "prefer-destructuring": "off",
+    "no-param-reassign": "off",
+    "import/no-extraneous-dependencies": ["error", { devDependencies: true }],
   },
 };

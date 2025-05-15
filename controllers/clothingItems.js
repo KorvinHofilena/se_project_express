@@ -1,17 +1,18 @@
 const ClothingItem = require("../models/clothingItem");
-const { ERROR_CODES } = require("../utils/errors");
+const {
+  BadRequestError,
+  NotFoundError,
+  ForbiddenError,
+  InternalServerError,
+} = require("../utils/errors");
 
-module.exports.getClothingItems = (req, res) => {
+module.exports.getClothingItems = (req, res, next) => {
   ClothingItem.find()
     .then((items) => res.send(items))
-    .catch(() =>
-      res
-        .status(ERROR_CODES.SERVER_ERROR)
-        .send({ message: "An error occurred on the server" })
-    );
+    .catch(() => next(new InternalServerError("Failed to fetch items")));
 };
 
-module.exports.createClothingItem = (req, res) => {
+module.exports.createClothingItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
   const owner = req.user._id;
 
@@ -19,102 +20,57 @@ module.exports.createClothingItem = (req, res) => {
     .then((item) => res.status(201).send(item))
     .catch((err) => {
       if (err.name === "ValidationError") {
-        res
-          .status(ERROR_CODES.BAD_REQUEST)
-          .send({ message: "Invalid data passed to create item" });
-      } else {
-        res
-          .status(ERROR_CODES.SERVER_ERROR)
-          .send({ message: "An error occurred on the server" });
+        return next(new BadRequestError("Invalid data passed to create item"));
       }
+      next(new InternalServerError());
     });
 };
 
-module.exports.deleteClothingItem = (req, res) => {
+module.exports.deleteClothingItem = (req, res, next) => {
   ClothingItem.findById(req.params.itemId)
-    .orFail(() => {
-      const error = new Error("Item not found");
-      error.statusCode = ERROR_CODES.NOT_FOUND;
-      throw error;
-    })
+    .orFail(() => new NotFoundError("Item not found"))
     .then((item) => {
       if (!item.owner.equals(req.user._id)) {
-        const error = new Error(
+        throw new ForbiddenError(
           "You do not have permission to delete this item"
         );
-        error.statusCode = ERROR_CODES.FORBIDDEN;
-        throw error;
       }
       return item.deleteOne();
     })
     .then(() => res.send({ message: "Item deleted successfully" }))
     .catch((err) => {
-      if (err.name === "CastError") {
-        res
-          .status(ERROR_CODES.BAD_REQUEST)
-          .send({ message: "Invalid item ID passed" });
-      } else if (err.statusCode === ERROR_CODES.NOT_FOUND) {
-        res.status(ERROR_CODES.NOT_FOUND).send({ message: err.message });
-      } else if (err.statusCode === ERROR_CODES.FORBIDDEN) {
-        res.status(ERROR_CODES.FORBIDDEN).send({ message: err.message });
-      } else {
-        res
-          .status(ERROR_CODES.SERVER_ERROR)
-          .send({ message: "An error occurred on the server" });
-      }
+      if (err.name === "CastError")
+        return next(new BadRequestError("Invalid item ID passed"));
+      next(err);
     });
 };
 
-module.exports.likeItem = (req, res) => {
+module.exports.likeItem = (req, res, next) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $addToSet: { likes: req.user._id } },
     { new: true }
   )
-    .orFail(() => {
-      const error = new Error("Item not found");
-      error.statusCode = ERROR_CODES.NOT_FOUND;
-      throw error;
-    })
+    .orFail(() => new NotFoundError("Item not found"))
     .then((item) => res.send(item))
     .catch((err) => {
-      if (err.name === "CastError") {
-        res
-          .status(ERROR_CODES.BAD_REQUEST)
-          .send({ message: "Invalid item ID passed" });
-      } else if (err.statusCode === ERROR_CODES.NOT_FOUND) {
-        res.status(ERROR_CODES.NOT_FOUND).send({ message: err.message });
-      } else {
-        res
-          .status(ERROR_CODES.SERVER_ERROR)
-          .send({ message: "An error occurred on the server" });
-      }
+      if (err.name === "CastError")
+        return next(new BadRequestError("Invalid item ID passed"));
+      next(err);
     });
 };
 
-module.exports.dislikeItem = (req, res) => {
+module.exports.dislikeItem = (req, res, next) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $pull: { likes: req.user._id } },
     { new: true }
   )
-    .orFail(() => {
-      const error = new Error("Item not found");
-      error.statusCode = ERROR_CODES.NOT_FOUND;
-      throw error;
-    })
+    .orFail(() => new NotFoundError("Item not found"))
     .then((item) => res.send(item))
     .catch((err) => {
-      if (err.name === "CastError") {
-        res
-          .status(ERROR_CODES.BAD_REQUEST)
-          .send({ message: "Invalid item ID passed" });
-      } else if (err.statusCode === ERROR_CODES.NOT_FOUND) {
-        res.status(ERROR_CODES.NOT_FOUND).send({ message: err.message });
-      } else {
-        res
-          .status(ERROR_CODES.SERVER_ERROR)
-          .send({ message: "An error occurred on the server" });
-      }
+      if (err.name === "CastError")
+        return next(new BadRequestError("Invalid item ID passed"));
+      next(err);
     });
 };

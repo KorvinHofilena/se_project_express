@@ -7,11 +7,7 @@ const morgan = require("morgan");
 
 const { connectToDatabase } = require("./db");
 const routes = require("./routes");
-const {
-  NotFoundError,
-  ERROR_CODES,
-  InternalServerError,
-} = require("./utils/errors");
+const { NotFoundError, ERROR_CODES } = require("./utils/errors");
 
 const { PORT = 3001 } = process.env;
 
@@ -46,14 +42,13 @@ app.use(
 );
 
 app.use(routes);
-
 app.use(errors());
 
-app.use((req, res, next) => {
-  next(new NotFoundError("Requested resource not found"));
+app.use((req, res, _next) => {
+  throw new NotFoundError("Requested resource not found");
 });
 
-app.use((err, req, res, next) => {
+app.use((err, req, res, _next) => {
   const {
     statusCode = ERROR_CODES.SERVER_ERROR,
     message = "An error occurred on the server",

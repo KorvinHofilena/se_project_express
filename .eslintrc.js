@@ -20,5 +20,7 @@ module.exports = {
     "prefer-destructuring": "off",
     "no-param-reassign": "off",
     "import/no-extraneous-dependencies": ["error", { devDependencies: true }],
+    "max-classes-per-file": "off",
+    "import/extensions": "off",
   },
 };

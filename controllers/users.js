@@ -16,7 +16,7 @@ module.exports.getCurrentUser = (req, res, next) => {
       if (!user) throw new NotFoundError("User not found");
       res.send(user);
     })
-    .catch((err) => next(new InternalServerError()));
+    .catch((_err) => next(new InternalServerError()));
 };
 
 module.exports.createUser = (req, res, next) => {
@@ -35,7 +35,7 @@ module.exports.createUser = (req, res, next) => {
         return next(new ConflictError("Email already exists"));
       if (err.name === "ValidationError")
         return next(new BadRequestError("Invalid data"));
-      next(new InternalServerError());
+      return next(new InternalServerError());
     });
 };
 
@@ -59,7 +59,7 @@ module.exports.login = (req, res, next) => {
     })
     .catch((err) => {
       if (err instanceof UnauthorizedError) return next(err);
-      next(new InternalServerError());
+      return next(new InternalServerError());
     });
 };
 
@@ -78,6 +78,6 @@ module.exports.updateUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === "ValidationError")
         return next(new BadRequestError("Invalid data"));
-      next(new InternalServerError());
+      return next(new InternalServerError());
     });
 };

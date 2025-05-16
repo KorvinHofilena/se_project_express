@@ -1,9 +1,11 @@
+const { celebrate, Joi } = require("celebrate");
+
 const validateSignup = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30).required(),
+    name: Joi.string().required(),
+    avatar: Joi.string().uri().required(),
     email: Joi.string().email().required(),
     password: Joi.string().required(),
-    avatar: Joi.string().uri(),
   }),
 });
 

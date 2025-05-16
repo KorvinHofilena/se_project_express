@@ -8,7 +8,7 @@ const {
   ConflictError,
   UnauthorizedError,
   InternalServerError,
-} = require("../utils/errors");
+} = require("../utils/errors/errors");
 
 module.exports.getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)

@@ -4,7 +4,7 @@ const {
   NotFoundError,
   ForbiddenError,
   InternalServerError,
-} = require("../utils/errors");
+} = require("../utils/errors/errors");
 
 module.exports.getClothingItems = (req, res, next) => {
   ClothingItem.find()

@@ -20,3 +20,13 @@ You can find the backend code for this project in the following repository: http
 ### Testing
 
 Before committing your code, make sure you edit the file `sprint.txt` in the root folder. The file `sprint.txt` should contain the number of the sprint you're currently working on. For ex. 12
+
+Back-end domain:
+
+REACT_APP_BASE_URL=http://localhost:3001
+
+REACT_APP_MONGO_URI="mongodb+srv://hofilenakorvin:HnGbkzYSjs5kBoJh@cluster0.lo8fk.mongodb.net/myDatabaseName?retryWrites=true&w=majority"
+
+Front-end Domain:
+
+korvinhofilena@wtwrwtwr.jumpingcrab.com:/home/korvinhofilena/frontend

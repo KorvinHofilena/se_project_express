@@ -15,7 +15,7 @@ The back-end project is focused on creating a server for the WTWR application. Y
 
 ## Backend Repository
 
-You can find the backend code for this project in the following repository: https://github.com/KorvinHofilena/se_project_express.git
+You can find the backend code for this project in the following repository: http://api.express-demo.jumpingcrab.com/
 
 ### Testing
 

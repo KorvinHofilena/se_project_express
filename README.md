@@ -25,7 +25,7 @@ REACT_APP_MONGO_URI="mongodb+srv://hofilenakorvin:HnGbkzYSjs5kBoJh@cluster0.lo8f
 
 Front-end Domain:
 
-http://www.wtwrwtwr.jumpingcrab.com
+http://www.express-demo.jumpingcrab.com
 
 Back-end Domain:
 

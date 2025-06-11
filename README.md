@@ -15,7 +15,7 @@ The back-end project is focused on creating a server for the WTWR application. Y
 
 ## Backend Repository
 
-You can find the backend code for this project in the following repository: http://api.express-demo.jumpingcrab.com/
+You can find the backend code for this project in the following repository: http://api.exp-demo.jumpingcrab.com/
 
 ### Testing
 
@@ -25,7 +25,7 @@ REACT_APP_MONGO_URI="mongodb+srv://hofilenakorvin:HnGbkzYSjs5kBoJh@cluster0.lo8f
 
 Front-end Domain:
 
-http://www.express-demo.jumpingcrab.com
+https://www.exp-demo.jumpingcrab.com
 
 Back-end Domain:
 
